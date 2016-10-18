@@ -12,7 +12,7 @@ you encounter any issue, bug reports and pull requests are more than welcome!
     $ git clone https://github.com/cappsule/nofear
     $ cd nofear/
     $ ./build.sh filesystem
-    $ ./install.sh
+    $ sudo ./install.sh
     $ sudo apt install socat xpra
     $ sudo sysctl -w net.ipv4.ip_forward=1
     $ sudo iptables -t nat -A POSTROUTING -j MASQUERADE
@@ -41,13 +41,13 @@ you encounter any issue, bug reports and pull requests are more than welcome!
 
 Regarding virtualization, [Cappsule](https://cappsule.github.io) introduced the
 concept of *on the fly virtualization* with a custom hypervisor; whereas NoFear
-makes use of [KVM](https://www.linux-kvm.org/), included in mainline
-Linux kernel.
+makes use of [KVM](https://www.linux-kvm.org/) included in mainline Linux
+kernel.
 
 Concerning dependencies, Cappsule requires a custom Ubuntu configuration and a
-specific a Linux kernel version. Any change to the Linux kernel is prone to
-break the hypervisor or the VMs. NoFear aims at being distro-independent,
-requiring software distributed through the distro packages.
+specific Linux kernel version. Any change to the Linux kernel is prone to break
+the hypervisor or the VMs. NoFear aims at being distro-independent, requiring
+software distributed through the distro packages.
 
 
 

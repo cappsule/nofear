@@ -1,0 +1,33 @@
+diff --git a/src/gui.sh b/src/gui.sh
+index 95d7855..b33e15b 100755
+--- a/src/gui.sh
++++ b/src/gui.sh
+@@ -20,7 +20,7 @@ function run_xpra()
+ 	SOCAT_CMD="socat UNIX-CONNECT:$HOME/.xpra/$GUEST_HOSTNAME-$GUEST_DISPLAY,retry=3 TCP-CONNECT:$GATEWAY:$xpra_port"
+ 
+ 	/usr/bin/xpra start ":$GUEST_DISPLAY" \
+-				  --daemon=no \
++				  --no-daemon \
+ 				  --exit-with-children \
+ 				  --start="$SOCAT_CMD" \
+ 				  --start-child="$cmd"
+diff --git a/src/nofear.py b/src/nofear.py
+index 14b8713..9523f3e 100755
+--- a/src/nofear.py
++++ b/src/nofear.py
+@@ -162,12 +162,12 @@ def run_xpra(xpra_socket, xpra_port, with_sound=False):
+ 
+         xpra_cmd = [ 'xpra', 'attach', 'tcp:127.0.0.1:{}'.format(port) ]
+         if not with_sound:
+-            xpra_cmd.insert(2, '--speaker=disabled')
++            xpra_cmd.insert(2, '--no-speaker')
+         else:
+-            xpra_cmd.insert(2, '--speaker=on')
++            xpra_cmd.insert(2, '--speaker')
+ 
+         # enforce some options from nofear's xpra configuration
+-        os.putenv('XPRA_USER_CONF_DIR', NOFEAR_DIR)
++        os.putenv('XPRA_USER_CONF_DIRS', NOFEAR_DIR)
+ 
+         os.execvp(xpra_cmd[0], xpra_cmd)
+         sys.exit(1)

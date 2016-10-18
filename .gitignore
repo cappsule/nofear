@@ -1,0 +1,3 @@
+build/kvmtool/
+build/linux-*/
+build/rootfs.tar.bz2

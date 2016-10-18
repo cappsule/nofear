@@ -1,0 +1,5 @@
+root:x:0:
+tty:x:5:user
+utmp:x:43:
+staff:x:50:
+user:x:2000:

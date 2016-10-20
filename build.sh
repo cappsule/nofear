@@ -9,7 +9,7 @@
 
 set -e
 
-KVMTOOL_GIT='https://github.com/cappsule/kvmtool'
+KVMTOOL_GIT='https://github.com/cappsule/kvmtool.git'
 GPG_FINGERPRINT='C7839D20FE954EAD36046E6CFFF0B1815A6C1BAD'
 
 function gpg_hint()

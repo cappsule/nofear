@@ -101,4 +101,4 @@ It's probably a permission error. Depending of your distro, your user might not
 be in the `kvm` group or `/dev/kvm` doesn't have the correct ACL. The ACL of a
 file can be modified thanks to `setfacl`. For instance:
 
-    sudo setfacl -d u:user:rw /dev/kvm
+    sudo setfacl -m u:user:rw /dev/kvm

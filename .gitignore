@@ -1,4 +1,5 @@
 build/kvmtool/
 build/linux-*/
+build/linux-*.tar.xz
 build/rootfs.tar.bz2
 notes/

@@ -105,6 +105,17 @@ function bind_virt
 	mount --bind /virt "$target/overlay/virt"
 }
 
+function mount_shared_folder
+{
+	local target=$1
+	local dir=$2
+
+	if [ -n "$dir" ]; then
+		mkdir -p "$target/overlay/$dir"
+		mount -t 9p nofear-shared "$target/overlay/$dir" -o trans=virtio,version=9p2000.L
+	fi
+}
+
 function run_command
 {
 	local target=$1
@@ -145,6 +156,7 @@ function main()
 	mount_overlay "$target"
 	mount_persistent_dirs "$target"
 	bind_virt "$target"
+	mount_shared_folder "$target" "$NOFEAR_SHARED"
 
 	run_command "$target" false $*
 

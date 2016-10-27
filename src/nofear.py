@@ -18,6 +18,7 @@ import threading
 import time
 
 NOFEAR_DIR = '/usr/local/share/nofear/'
+SHARED_DIR = '/shared'
 
 
 class NoFearError(Exception):
@@ -25,9 +26,10 @@ class NoFearError(Exception):
 
 
 class InitScript:
-    def __init__(self, gui, xpra_port, *args):
+    def __init__(self, gui, xpra_port, shared_folder, *args):
         self.args = [ a for a in args ]
         self.path = ''
+        self.shared_folder = shared_folder
 
         if gui:
             # prefix command by the gui script path, which requires host tcp
@@ -37,6 +39,8 @@ class InitScript:
 
     def write(self, profile, path):
         content_fmt  = '#!/bin/bash\n'
+        if self.shared_folder:
+            content_fmt += 'export NOFEAR_SHARED="{}"\n'.format(self.shared_folder)
         content_fmt += 'exec {}/base.sh {} {}\n'
         content = content_fmt.format(NOFEAR_DIR, profile, ' '.join(self.args))
 
@@ -101,8 +105,8 @@ class Profile:
         print('[+] profile "{}" deleted successfully'.format(self.name), file=sys.stderr)
 
 
-    def create_init_script(self, gui, xpra_port, *args):
-        script = InitScript(gui, xpra_port, *args)
+    def create_init_script(self, gui, xpra_port, shared_folder, *args):
+        script = InitScript(gui, xpra_port, shared_folder, *args)
         script.write(self.name, self.path)
         return script
 
@@ -190,6 +194,7 @@ def run_xpra(xpra_socket, xpra_port, with_sound=False):
 if __name__ == '__main__':
     parser = ArgumentParser(prog='{}'.format(sys.argv[0]), description="Execute a new virtualized process.")
     parser.add_argument('-d', '--delete-profile', action='store', default=None, help="Delete an existing profile")
+    parser.add_argument('-f', '--shared-folder', action='store', default=None, help="Share a folder between host and guest into {}".format(SHARED_DIR))
     parser.add_argument('-g', '--gui', action='store_true', default=False, help="Enable graphical interface")
     parser.add_argument('-n', '--new-profile', action='store', default=None, help="Create a new profile")
     parser.add_argument('-p', '--profile', action='store', default='default', help="Specify profile name")
@@ -239,7 +244,12 @@ if __name__ == '__main__':
     else:
         xpra_port = 65536
 
-    script = profile.create_init_script(args.gui, xpra_port, *args.target)
+    if args.shared_folder:
+        shared_folder = SHARED_DIR
+    else:
+        shared_folder = None
+
+    script = profile.create_init_script(args.gui, xpra_port, shared_folder, *args.target)
 
     lkvm_cmd = [
         'lkvm-nofear', 'run',
@@ -250,6 +260,9 @@ if __name__ == '__main__':
         #'--network', 'mode=user,guest_mac=02:15:15:15:15:15',
         '--network', 'mode=tap,guest_mac=02:15:15:15:13:37',
     ]
+
+    if shared_folder:
+        lkvm_cmd += [ '--9p', args.shared_folder + ',nofear-shared' ]
 
     # launch gui if specified
     if args.gui:

@@ -167,6 +167,17 @@ Use `--help` to get some help:
     $ nofear --gui --sound firefox
 
 
+## Shared folder
+
+A folder can be shared between host and guest thanks to `-f` or
+`--shared-folder` argument. For example, to share `~/code/project` with the
+guest:
+
+    $ nofear --shared-folder ~/code/project
+
+The shared folder is mounted in the guest under `/shared`.
+
+
 
 # Contributions
 

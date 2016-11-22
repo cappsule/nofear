@@ -1,5 +1,7 @@
 NoFear is a tool developed by [Quarkslab](http://quarkslab.com) to sandbox
-applications transparently thanks to hardware virtualization.
+applications transparently thanks to hardware virtualization. More information
+can be found in the
+[No Tears, No Fears blogpost](http://blog.quarkslab.com/no-tears-no-fears.html).
 
 It works out of the box on Ubuntu 16.04 but may require a few tweaks on other
 distros. Please give a look at the various patches in the `distro/` folder. If
@@ -9,18 +11,23 @@ you encounter any issue, bug reports and pull requests are more than welcome!
 
 # tl;dr
 
-    $ git clone https://github.com/cappsule/nofear
-    $ cd nofear/
-    $ ./build.sh filesystem
-    $ sudo ./install.sh
-    $ sudo apt install socat xpra
-    $ sudo sysctl -w net.ipv4.ip_forward=1
-    $ sudo iptables -t nat -A POSTROUTING -j MASQUERADE
+## Install
 
-    $ nofear
-    $ nofear ps fauxw
-    $ nofear --gui xclock -update 1
-    $ nofear --gui --sound firefox
+    git clone https://github.com/cappsule/nofear
+    cd nofear/
+    ./build.sh filesystem
+    sudo ./install.sh
+    sudo apt install socat xpra
+    sudo sysctl -w net.ipv4.ip_forward=1
+    sudo iptables -t nat -A POSTROUTING -j MASQUERADE
+
+
+## Run
+
+    nofear
+    nofear ps fauxw
+    nofear --gui xclock -update 1
+    nofear --gui --sound firefox
 
 
 

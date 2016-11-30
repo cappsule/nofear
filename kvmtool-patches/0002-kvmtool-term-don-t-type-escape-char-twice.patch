@@ -1,0 +1,25 @@
+From 407636a98ec016c7c22298a46168ce8132d35df2 Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Wed, 30 Nov 2016 15:33:34 +0100
+Subject: [PATCH 2/5] kvmtool: term: don't type escape char twice
+
+---
+ term.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/term.c b/term.c
+index 58f66a0..98816ef 100644
+--- a/term.c
++++ b/term.c
+@@ -44,7 +44,7 @@ int term_getc(struct kvm *kvm, int term)
+ 
+ 	if (c == term_escape_char) {
+ 		term_got_escape = true;
+-		return -1;
++		return c;
+ 	}
+ 
+ 	return c;
+-- 
+2.7.4
+

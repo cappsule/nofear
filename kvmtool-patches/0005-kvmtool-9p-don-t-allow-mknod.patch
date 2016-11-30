@@ -1,0 +1,31 @@
+From eaf5e17e3be3a57eebf3b8a41b6da0cd690d390a Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Wed, 30 Nov 2016 15:43:58 +0100
+Subject: [PATCH 5/5] kvmtool: 9p: don't allow mknod
+
+If kvmtool runs as root, the guest can create block or character special files
+in the host. It can probably leads to VM escapes.
+---
+ virtio/9p.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/virtio/9p.c b/virtio/9p.c
+index 8d06b2f..fa3365f 100644
+--- a/virtio/9p.c
++++ b/virtio/9p.c
+@@ -1000,6 +1000,12 @@ static void virtio_p9_mknod(struct p9_dev *p9dev,
+ 	virtio_p9_pdu_readf(pdu, "dsdddd", &fid_val, &name, &mode,
+ 			    &major, &minor, &gid);
+ 
++	/* don't allow the creation of special files */
++	if (mode != S_IFREG) {
++		errno = EPERM;
++		goto err_out;
++	}
++
+ 	dfid = get_fid(p9dev, fid_val);
+ 
+ 	if (get_full_path(full_path, sizeof(full_path), dfid, name) != 0)
+-- 
+2.7.4
+

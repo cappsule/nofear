@@ -1,0 +1,56 @@
+From 8c1ce611860a53794e6356f52810ad39daf5dd55 Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Wed, 30 Nov 2016 15:34:55 +0100
+Subject: [PATCH 3/5] kvmtool: comment debug messages
+
+---
+ builtin-run.c | 12 ++++++------
+ guest/init.c  |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/builtin-run.c b/builtin-run.c
+index 72b878d..de9243b 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -616,10 +616,10 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+ 
+ 	kvm->cfg.real_cmdline = real_cmdline;
+ 
+-	printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+-		kvm->cfg.kernel_filename,
+-		(unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
+-		kvm->cfg.nrcpus, kvm->cfg.guest_name);
++	//printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
++	//	kvm->cfg.kernel_filename,
++	//	(unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
++	//	kvm->cfg.nrcpus, kvm->cfg.guest_name);
+ 
+ 	if (init_list__init(kvm) < 0)
+ 		die ("Initialisation failed");
+@@ -649,8 +649,8 @@ static void kvm_cmd_run_exit(struct kvm *kvm, int guest_ret)
+ 
+ 	init_list__exit(kvm);
+ 
+-	if (guest_ret == 0)
+-		printf("\n  # KVM session ended normally.\n");
++	//if (guest_ret == 0)
++	//	printf("\n  # KVM session ended normally.\n");
+ }
+ 
+ int kvm_cmd_run(int argc, const char **argv, const char *prefix)
+diff --git a/guest/init.c b/guest/init.c
+index 46e3fa4..eca85a2 100644
+--- a/guest/init.c
++++ b/guest/init.c
+@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
+ 	pid_t child;
+ 	int status;
+ 
+-	puts("Mounting...");
++	//puts("Mounting...");
+ 
+ 	do_mounts();
+ 
+-- 
+2.7.4
+

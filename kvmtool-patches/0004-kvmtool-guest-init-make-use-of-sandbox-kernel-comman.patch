@@ -1,0 +1,80 @@
+From 32b9f359afde550e382f868afd4759f6be30d1b5 Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Wed, 30 Nov 2016 15:35:46 +0100
+Subject: [PATCH 4/5] kvmtool: guest: init: make use of "sandbox" kernel
+ command line argument
+
+If "sandbox=XXXXXX" is specified on the kernel command line, execute
+/virt/sandbox-XXXXXX. Otherwise, execute /virt/sandbox.sh (this is the default
+kvmtool behaviour).
+
+It avoids a race condition when 2 VMs are launched with different settings, and
+NoFear uses the "sandbox" argument to tell the guest the command to be run.
+---
+ guest/init.c | 34 ++++++++++++++++++++++++++++++----
+ 1 file changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/guest/init.c b/guest/init.c
+index eca85a2..ea81583 100644
+--- a/guest/init.c
++++ b/guest/init.c
+@@ -10,6 +10,7 @@
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ #include <sys/reboot.h>
++#include <limits.h>
+ 
+ static int run_process(char *filename)
+ {
+@@ -40,8 +41,35 @@ static void do_mounts(void)
+ 	mount("devpts", "/dev/pts", "devpts", 0, NULL);
+ }
+ 
++static void get_stage2_path(char *result, size_t size)
++{
++	char cmdline[4096];
++	char *p, *q;
++	FILE *fp;
++
++	fp = fopen("/proc/cmdline", "r");
++	if (fp == NULL)
++		goto default_path;
++
++	fgets(cmdline, sizeof(cmdline), fp);
++	fclose(fp);
++
++	p = strstr(cmdline, " sandbox=");
++	if (p == NULL)
++		goto default_path;
++
++	p += sizeof(" sandbox=") - 1;
++	p = strsep(&p, " \n");
++	snprintf(result, size, "/virt/sandbox-%s", p);
++	return;
++
++default_path:
++	strncpy(result, "/virt/sandbox.sh", size);
++}
++
+ int main(int argc, char *argv[])
+ {
++	char stage2_path[PATH_MAX];
+ 	pid_t child;
+ 	int status;
+ 
+@@ -60,10 +88,8 @@ int main(int argc, char *argv[])
+ 		printf("Fatal: fork() failed with %d\n", child);
+ 		return 0;
+ 	} else if (child == 0) {
+-		if (access("/virt/sandbox.sh", R_OK) == 0)
+-			run_process_sandbox("/bin/sh");
+-		else
+-			run_process("/bin/sh");
++		get_stage2_path(stage2_path, sizeof(stage2_path));
++		run_process(stage2_path);
+ 	} else {
+ 		pid_t corpse;
+ 
+-- 
+2.7.4
+

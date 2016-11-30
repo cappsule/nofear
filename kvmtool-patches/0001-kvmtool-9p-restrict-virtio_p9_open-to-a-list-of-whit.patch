@@ -1,0 +1,88 @@
+From 8f9af83bb39a830b6911e98687ffb890f33b41cd Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Wed, 30 Nov 2016 15:32:58 +0100
+Subject: [PATCH 1/5] kvmtool: 9p restrict virtio_p9_open to a list of
+ whitelisted directories
+
+The following folders are shared with the host in read-only mode: /bin, /lib,
+/lib64, /opt, /sbin and /usr. It allows software installed in the host to be
+directly available to the VMs, but sensitive folders (/etc and /home) are not
+available not to leak any information to the guests.
+---
+ virtio/9p.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/virtio/9p.c b/virtio/9p.c
+index 6acbfdd..8d06b2f 100644
+--- a/virtio/9p.c
++++ b/virtio/9p.c
+@@ -273,6 +273,31 @@ static int stat_rel(struct p9_dev *p9dev, const char *path, struct stat *st)
+ 	return 0;
+ }
+ 
++
++static const char *allowed_dirs[] = {
++	".",
++	"..",
++	"bin",
++	"lib",
++	"lib64",
++	"opt",
++	"sbin",
++	"usr",
++	NULL
++};
++
++static bool is_dir_allowed(const char *path)
++{
++	const char **p;
++
++	for (p = allowed_dirs; *p != NULL; p++) {
++		if (strcmp(*p, path) == 0)
++			return true;
++	}
++
++	return false;
++}
++
+ static void virtio_p9_open(struct p9_dev *p9dev,
+ 			   struct p9_pdu *pdu, u32 *outlen)
+ {
+@@ -280,6 +305,8 @@ static void virtio_p9_open(struct p9_dev *p9dev,
+ 	struct stat st;
+ 	struct p9_qid qid;
+ 	struct p9_fid *new_fid;
++	char link[32], path[PATH_MAX];
++	ssize_t n;
+ 
+ 
+ 	virtio_p9_pdu_readf(pdu, "dd", &fid, &flags);
+@@ -294,6 +321,25 @@ static void virtio_p9_open(struct p9_dev *p9dev,
+ 		new_fid->dir = opendir(new_fid->abs_path);
+ 		if (!new_fid->dir)
+ 			goto err_out;
++
++		/* get the absolute path of the directory */
++		snprintf(link, sizeof(link), "/proc/self/fd/%d", dirfd(new_fid->dir));
++		n = readlink(link, path, sizeof(path));
++
++		/* if readlink fails, set the path to "x" to make the permission
++		 * check fail */
++		if (n == -1 || (size_t)n >= sizeof(path)) {
++			path[0] = 'x';
++			n = 1;
++		}
++		path[n] = '\x00';
++
++		if (strcmp(path, "/") != 0 && strchr(path + 1, '/') == NULL) {
++			if (!is_dir_allowed(path + 1)) {
++				errno = EACCES;
++				goto err_out;
++			}
++		}
+ 	} else {
+ 		new_fid->fd  = open(new_fid->abs_path,
+ 				    virtio_p9_openflags(flags));
+-- 
+2.7.4
+

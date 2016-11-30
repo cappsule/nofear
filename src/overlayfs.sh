@@ -141,10 +141,10 @@ function run_command
 
 function cleanup
 {
-	local image=$1
+	local target=$1
 
 	sync
-	umount "$image"
+	umount --recursive "$target"
 }
 
 function main()
@@ -160,7 +160,7 @@ function main()
 
 	run_command "$target" false $*
 
-	cleanup "$image"
+	cleanup "$target"
 }
 
 main $*

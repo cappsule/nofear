@@ -9,21 +9,8 @@
 
 set -e
 
-KVMTOOL_GIT='https://github.com/cappsule/kvmtool.git'
-GPG_FINGERPRINT='C7839D20FE954EAD36046E6CFFF0B1815A6C1BAD'
-
-function gpg_hint()
-{
-	gpg --fingerprint "$GPG_FINGERPRINT" >/dev/null 2>/dev/null && return
-
-	echo ''
-	echo "Import NoFear's public key with the following commands:"
-	echo '  wget -q -O /tmp/nofear.asc https://keybase.io/cappsule/key.asc'
-	echo '  gpg --import /tmp/nofear.asc'
-	echo ''
-	echo "Please ensure that the fingerprint is actually $GPG_FINGERPRINT:"
-	echo '  gpg --with-fingerprint /tmp/nofear.asc'
-}
+KVMTOOL_GIT='https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git'
+KVMTOOL_COMMIT='b09224228296d9febf120f3aa956964cc01a14b5'
 
 function build_kvmtool()
 {
@@ -31,20 +18,10 @@ function build_kvmtool()
 
 	if [ ! -d "$dst/" ]; then
 		git clone "$KVMTOOL_GIT" "$dst"
-
-		if [ -z "$YOLO" ]; then
-			# check the GPG signature of last commit
-			git -C "$dst/" verify-commit HEAD \
-				|| (echo '[-] failed to verify last git commit signature'
-					gpg_hint
-					exit 1)
-
-			# check the GPG key fingerprint
-			git -C "$dst/" verify-commit --raw HEAD \
-				|& grep -q "^\[GNUPG:\] VALIDSIG $GPG_FINGERPRINT" \
-				|| (echo '[-] unexpected GPG key'; exit 1)
-		fi
 	fi
+
+	git -C "$dst/" reset --hard "$KVMTOOL_COMMIT"
+	git -C "$dst/" am "$(pwd)/kvmtool-patches/"*.patch
 
 	make -C "$dst/"
 

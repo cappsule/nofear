@@ -86,11 +86,14 @@ Each component is built by default. The 2 following commands are identical:
 The build script verifies the authenticity and/or the integrity of various
 components:
 
-- the signature of the last `kvmtool` is checked (you must have my
-  [public key](https://keybase.io/cappsule/key.asc))
-- the sha256sum of kernel sources is checked. The goal isn't to verify the
+- The sha256sum of kernel sources is checked. The goal isn't to verify the
   source code integrity (which is executed in a VMs once compiled), but to avoid
   malicious Makefiles which could compromise the host during the build step.
+- The `kvmtool` git repository is reset to a specific revision. If an attacker
+  were able to create the same SHA-1 hash with different data, then the
+  repository would have been successfully compromised. I would largely prefer to
+  verify the signature of the last commit; unfortunately kvmtool commits
+  aren't signed at the time.
 
 You should also check the signature of these repository's commit with the
 command:

@@ -73,7 +73,20 @@ class Profile:
         self.name = name
         self.path = os.path.join(os.path.expanduser('~'), '.lkvm/', self.name)
 
-    def _check_profile_name(self, name):
+    @classmethod
+    def list_available(cls):
+        path = os.path.join(os.path.expanduser('~'), '.lkvm/')
+        for filename in os.listdir(path):
+            try:
+                cls._check_profile_name(filename)
+            except NoFearError:
+                continue
+            fullpath = os.path.join(path, filename)
+            if os.path.isdir(fullpath) and not os.path.islink(fullpath):
+                print(filename)
+
+    @staticmethod
+    def _check_profile_name(name):
         # avoid path traversal attacks
         if not re.match('^[a-zA-Z0-9][a-zA-Z0-9-_.]*$', name):
             raise NoFearError('invalid profile "{}"'.format(name))
@@ -196,6 +209,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delete-profile', action='store', default=None, help="Delete an existing profile")
     parser.add_argument('-f', '--shared-folder', action='store', default=None, help="Share a folder between host and guest into {}".format(SHARED_DIR))
     parser.add_argument('-g', '--gui', action='store_true', default=False, help="Enable graphical interface")
+    parser.add_argument('-l', '--list-profiles', action='store_true', default=False, help="List available profiles")
     parser.add_argument('-n', '--new-profile', action='store', default=None, help="Create a new profile")
     parser.add_argument('-p', '--profile', action='store', default='default', help="Specify profile name")
     parser.add_argument('-s', '--sound', action='store_true', default=False, help="Enable sound")
@@ -219,6 +233,10 @@ if __name__ == '__main__':
 
         timestamp = '{}'.format(time.time()).encode('utf-8')
         args.profile = hashlib.sha256(timestamp).hexdigest()
+
+    if args.list_profiles:
+        Profile.list_available()
+        sys.exit(0)
 
     if args.delete_profile:
         profile = Profile(args.delete_profile)

@@ -5,12 +5,13 @@
 
 set -e
 
-RELEASE_URL=https://github.com/cappsule/nofear/releases/download/latest
+VERSION=v0.1.1
+RELEASE_URL=https://github.com/cappsule/nofear/releases/download
 RELEASE_FILE=nofear.tar.bz2
 
 function download_release()
 {
-	wget "$RELEASE_URL/$RELEASE_FILE" -O "build/$RELEASE_FILE"
+	wget "$RELEASE_URL/$VERSION/$RELEASE_FILE" -O "build/$RELEASE_FILE"
 
 	sha256sum --check build/SHA256SUMS.release || \
 		( echo "[-] The sha256sum of $RELEASE_FILE is invalid!"

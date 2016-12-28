@@ -40,7 +40,7 @@ function build_bzimage()
 				 -O "$dst/$version.tar.xz"
 		fi
 		if [ -z "$YOLO" ]; then
-			sha256sum --check "$dst/SHA256SUMS"
+			sha256sum --check "$dst/SHA256SUMS.kernel"
 		fi
 		tar -C "$dst/" -xJf "$dst/$version.tar.xz"
 	fi

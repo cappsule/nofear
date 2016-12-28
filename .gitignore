@@ -1,5 +1,7 @@
+build/bzImage
 build/kvmtool/
 build/linux-*/
 build/linux-*.tar.xz
+build/lkvm
+build/nofear.tar.bz2
 build/rootfs.tar.bz2
-notes/

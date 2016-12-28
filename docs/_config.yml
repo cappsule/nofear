@@ -1,0 +1,7 @@
+title: NoFear
+description: virtualize your apps on the fly
+baseurl: "/nofear"
+url: "https://cappsule.github.io"
+
+# Build settings
+markdown: kramdown

@@ -1,0 +1,11 @@
+<div class="header clearfix">
+  <nav>
+    <ul class="nav nav-pills pull-right">
+      {% for my_page in site.pages %} {% if my_page.title and my_page.title != "Bug bounty" %} {% assign current = page.url | downcase | split: '/' %} {% assign ltitle = my_page.title | downcase %} {% if current[-1] == ltitle %}
+      <li role="presentation" class="active"><a href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title | escape }}</a></li> {% else %}
+      <li role="presentation"><a href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title | escape }}</a></li>
+      {% endif %} {% endif %} {% endfor %}
+    </ul>
+  </nav>
+  <h3 class="text-muted"><b><a href="{{ site.baseurl }}/" class="pagetitle">NoFear</a></b></h3>
+</div>

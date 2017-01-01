@@ -1,12 +1,5 @@
 #!/bin/bash
 
-#
-# If you don't give a fuck about security, set YOLO environment variable. It
-# skips any signature verification.
-#
-#   YOLO=1 ./build.sh
-#
-
 set -e
 
 KVMTOOL_GIT='https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git'
@@ -39,9 +32,7 @@ function build_bzimage()
 			wget "https://cdn.kernel.org/pub/linux/kernel/v4.x/$version.tar.xz" \
 				 -O "$dst/$version.tar.xz"
 		fi
-		if [ -z "$YOLO" ]; then
-			sha256sum --check "$dst/SHA256SUMS.kernel"
-		fi
+		sha256sum --check "$dst/SHA256SUMS.kernel"
 		tar -C "$dst/" -xJf "$dst/$version.tar.xz"
 	fi
 

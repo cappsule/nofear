@@ -45,8 +45,3 @@ You should also check the signature of these repository's commit with the
 command:
 
     $ git verify-commit HEAD
-
-If you don't care about security, `YOLO` environment variable skips the
-signature checks:
-
-    $ YOLO=1 ./build.sh

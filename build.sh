@@ -14,7 +14,7 @@ function build_kvmtool()
 	fi
 
 	git -C "$dst/" reset --hard "$KVMTOOL_COMMIT"
-	git -C "$dst/" am "$(pwd)/kvmtool-patches/"*.patch
+	git -C "$dst/" am "$(pwd)/patches/kvmtool/"*.patch
 
 	make -C "$dst/"
 

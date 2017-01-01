@@ -77,25 +77,6 @@ Xpra packages.
 
 ## Common error messages
 
-#### CPU: vendor_id 'LKVMLKVMLKVM' unknown, using generic init.
-
-The following lines are printed during the boot of the VM:
-
-    CPU: vendor_id 'LKVMLKVMLKVM' unknown, using generic init.
-    CPU: Your system may be unstable.
-    microcode: no support for this CPU vendor
-
-It's just a warning and they can be ignored. If it bothers you, comment the
-following lines in Linux kernel source code
-[626, 627](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kernel/cpu/common.c?id=2b3061c77ce7e429b25a25560ba088e8e7193a67#n626)
-and
-[633](https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kernel/cpu/microcode/core.c?id=2b3061c77ce7e429b25a25560ba088e8e7193a67#n633).
-Then, the kernel must be built again and reinstalled:
-
-    $ ./build.sh bzimage
-    $ sudo ./install.sh
-
-
 #### You have requested a TAP device, but creation of one has failed because: Operation not permitted
 
 It seems that you didn't installed `lkvm-nofear` with the install script. To

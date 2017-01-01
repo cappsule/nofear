@@ -34,6 +34,10 @@ function build_bzimage()
 		fi
 		sha256sum --check "$dst/SHA256SUMS.kernel"
 		tar -C "$dst/" -xJf "$dst/$version.tar.xz"
+
+		find patches/kernel/ -type f -name '*.patch' | sort -n | while read l; do
+			patch -d "$dst/$version/" -p1 < "$l"
+		done
 	fi
 
 	mkdir -p "$dst/$version-build/"

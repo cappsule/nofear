@@ -1,0 +1,66 @@
+From b2944c68d56a7bb9a3b86c868e59a1cb60fe216f Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Sun, 1 Jan 2017 23:15:41 +0100
+Subject: [PATCH] comment out a few error messages
+
+- CPU: vendor_id 'LKVMLKVMLKVM' unknown, using generic init.
+- CPU: Your system may be unstable.
+- microcode: no support for this CPU vendor
+- reboot: Restarting system
+---
+ arch/x86/kernel/cpu/common.c         | 2 ++
+ arch/x86/kernel/cpu/microcode/core.c | 2 ++
+ kernel/reboot.c                      | 2 ++
+ 3 files changed, 6 insertions(+)
+
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 2b49b11..57584fb 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -559,9 +559,11 @@ static void get_cpu_vendor(struct cpuinfo_x86 *c)
+ 		}
+ 	}
+ 
++#if 0
+ 	printk_once(KERN_ERR
+ 			"CPU: vendor_id '%s' unknown, using generic init.\n" \
+ 			"CPU: Your system may be unstable.\n", v);
++#endif
+ 
+ 	c->x86_vendor = X86_VENDOR_UNKNOWN;
+ 	this_cpu = &default_cpu;
+diff --git a/arch/x86/kernel/cpu/microcode/core.c b/arch/x86/kernel/cpu/microcode/core.c
+index b3e94ef..dfccd3e 100644
+--- a/arch/x86/kernel/cpu/microcode/core.c
++++ b/arch/x86/kernel/cpu/microcode/core.c
+@@ -637,8 +637,10 @@ int __init microcode_init(void)
+ 		microcode_ops = init_intel_microcode();
+ 	else if (c->x86_vendor == X86_VENDOR_AMD)
+ 		microcode_ops = init_amd_microcode();
++#if 0
+ 	else
+ 		pr_err("no support for this CPU vendor\n");
++#endif
+ 
+ 	if (!microcode_ops)
+ 		return -ENODEV;
+diff --git a/kernel/reboot.c b/kernel/reboot.c
+index bd30a97..77e2bc8 100644
+--- a/kernel/reboot.c
++++ b/kernel/reboot.c
+@@ -216,10 +216,12 @@ void kernel_restart(char *cmd)
+ 	kernel_restart_prepare(cmd);
+ 	migrate_to_reboot_cpu();
+ 	syscore_shutdown();
++#if 0
+ 	if (!cmd)
+ 		pr_emerg("Restarting system\n");
+ 	else
+ 		pr_emerg("Restarting system with command '%s'\n", cmd);
++#endif
+ 	kmsg_dump(KMSG_DUMP_RESTART);
+ 	machine_restart(cmd);
+ }
+-- 
+2.7.4
+

@@ -21,11 +21,7 @@ Features:
 Example for `uname -a`:
 
     $ nofear uname -a
-    CPU: vendor_id 'LKVMLKVMLKVM' unknown, using generic init.
-    CPU: Your system may be unstable.
-    microcode: no support for this CPU vendor
-    Linux nofear-default 4.4.27 #1 SMP Wed Oct 26 17:50:11 CEST 2016 x86_64 x86_64 x86_64 GNU/Linux
-    reboot: Restarting system
+    Linux nofear-default 4.4.27 #1 SMP Mon Jan 2 10:52:39 CET 2017 x86_64 x86_64 x86_64 GNU/Linux
 
 Launching a GUI application takes a bit more time (a few seconds):
 

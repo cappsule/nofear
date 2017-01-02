@@ -63,7 +63,7 @@ or:
 
 
 
-## What's the current sate of the GUI feature?
+## What's the current state of the GUI feature?
 
 The launch hangs sometimes for no reason. We're investigating the issue.
 Currently, the Xpra server and Xpra client communicate through a TCP connection.

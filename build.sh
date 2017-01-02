@@ -71,7 +71,7 @@ function build_filesystem()
 		cp -p /etc/ld.so.cache "$dst/etc/"
 	fi
 
-	# copy packet manager configuration on Debian-like distros
+	# copy package manager configuration on Debian-like distros
 	local distro=$(lsb_release --short --id 2>/dev/null || true)
 	if [ "$distro" == "Ubuntu" ] || [ "$distro" == "Debian" ]; then
 		mkdir -p "$dst/var/lib/apt/lists/" \

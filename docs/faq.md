@@ -30,19 +30,6 @@ software distributed through the distro packages.
 
 
 
-## Is there any console issue?
-
-The console isn't resized automatically yet and must be resized manually with
-the `resize` binary. I didn't manage to fix this issue, but pull requests are
-welcome.
-
-    user@nofear-default:~$ resize
-    COLUMNS=239;
-    LINES=69;
-    export COLUMNS LINES;
-
-
-
 ## How to debug the gui?
 
 Launch nofear with `--gui` option but no arguments, and follow the indications:

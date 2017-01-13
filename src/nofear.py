@@ -273,10 +273,11 @@ if __name__ == '__main__':
         'lkvm-nofear', 'run',
 	'--kernel', os.path.join(NOFEAR_DIR, 'bzImage'),
 	'--mem', '2048',
-	'--params', 'quiet sandbox={}'.format(script.get_tmpname()),
+	'--params', 'console=hvc0 quiet sandbox={}'.format(script.get_tmpname()),
 	'--disk', profile.name,
         #'--network', 'mode=user,guest_mac=02:15:15:15:15:15',
         '--network', 'mode=tap,guest_mac=02:15:15:15:13:37',
+        '--console', 'virtio',
     ]
 
     if shared_folder:

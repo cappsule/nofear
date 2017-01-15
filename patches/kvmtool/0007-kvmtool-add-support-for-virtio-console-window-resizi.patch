@@ -1,0 +1,79 @@
+From 941bdbac71396b8c58a4ffcead71e8af1b28f5db Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+kvm@quarkslab.com>
+Date: Sun, 15 Jan 2017 17:42:36 +0100
+Subject: [PATCH] kvmtool: add support for virtio console window resizing
+
+This patch is straightforward and sends a virtio configuration interrupt
+to the guest when the window is resized.
+
+Unfortunately, there's a bug in the guest kernel function which handle
+this interrupt (config_work_handler) but a patch has been sent upstream
+( https://lkml.org/lkml/2017/1/14/111 ). The guest kernel crashes on
+SIGWINCH if this kernel patch isn't applied.
+---
+ virtio/console.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/virtio/console.c b/virtio/console.c
+index f1c0a19..eb2aa3a 100644
+--- a/virtio/console.c
++++ b/virtio/console.c
+@@ -55,6 +55,7 @@ static struct con_dev cdev = {
+ };
+ 
+ static int compat_id = -1;
++static struct kvm *g_kvm;
+ 
+ /*
+  * Interrupts are injected for hvc0 only.
+@@ -126,16 +127,35 @@ static u8 *get_config(struct kvm *kvm, void *dev)
+ 
+ static u32 get_host_features(struct kvm *kvm, void *dev)
+ {
++	return 1UL << VIRTIO_CONSOLE_F_SIZE;
++}
++
++static int update_console_size(void)
++{
++	struct virtio_console_config *conf = &cdev.config;
++	struct winsize sz;
++
++	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &sz) == -1)
++		return -1;
++
++	conf->cols = virtio_host_to_guest_u16(&cdev->vdev, sz.ws_col);
++	conf->rows = virtio_host_to_guest_u16(&cdev->vdev, sz.ws_row);
++
+ 	return 0;
+ }
+ 
++static void window_resized(int signum)
++{
++	if (update_console_size() == 0)
++		cdev.vdev.ops->signal_config(g_kvm, &cdev.vdev);
++}
++
+ static void set_guest_features(struct kvm *kvm, void *dev, u32 features)
+ {
+ 	struct con_dev *cdev = dev;
+ 	struct virtio_console_config *conf = &cdev->config;
+ 
+-	conf->cols = virtio_host_to_guest_u16(&cdev->vdev, conf->cols);
+-	conf->rows = virtio_host_to_guest_u16(&cdev->vdev, conf->rows);
++	update_console_size();
+ 	conf->max_nr_ports = virtio_host_to_guest_u32(&cdev->vdev, conf->max_nr_ports);
+ }
+ 
+@@ -221,6 +241,9 @@ int virtio_console__init(struct kvm *kvm)
+ 	if (compat_id == -1)
+ 		compat_id = virtio_compat_add_message("virtio-console", "CONFIG_VIRTIO_CONSOLE");
+ 
++	g_kvm = kvm;
++	signal(SIGWINCH, window_resized);
++
+ 	return 0;
+ }
+ virtio_dev_init(virtio_console__init);
+-- 
+2.7.4
+

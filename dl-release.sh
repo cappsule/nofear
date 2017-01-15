@@ -5,7 +5,7 @@
 
 set -e
 
-VERSION=v0.1.3
+VERSION=v0.1.4
 RELEASE_URL=https://github.com/cappsule/nofear/releases/download
 RELEASE_FILE=nofear.tar.bz2
 

@@ -1,0 +1,34 @@
+From 40280227220ce09af66333c2c5a6c5f3bacba4a7 Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Mon, 16 Jan 2017 13:31:25 +0100
+Subject: [PATCH] hvc_console: disable sysrq hack
+
+hvc_console uses ^O as the magic-sysrq key. It interferes with
+midnight commander keyboard shortcuts for some users.
+---
+ drivers/tty/hvc/hvc_console.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/tty/hvc/hvc_console.c b/drivers/tty/hvc/hvc_console.c
+index 9b5c0fb..4fa79a5 100644
+--- a/drivers/tty/hvc/hvc_console.c
++++ b/drivers/tty/hvc/hvc_console.c
+@@ -669,6 +669,7 @@ int hvc_poll(struct hvc_struct *hp)
+ 			break;
+ 		}
+ 		for (i = 0; i < n; ++i) {
++#if 0
+ #ifdef CONFIG_MAGIC_SYSRQ
+ 			if (hp->index == hvc_console.index) {
+ 				/* Handle the SysRq Hack */
+@@ -686,6 +687,7 @@ int hvc_poll(struct hvc_struct *hp)
+ 				}
+ 			}
+ #endif /* CONFIG_MAGIC_SYSRQ */
++#endif
+ 			tty_insert_flip_char(&hp->port, buf[i], 0);
+ 		}
+ 
+-- 
+2.7.4
+

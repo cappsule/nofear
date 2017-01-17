@@ -1,0 +1,34 @@
+From ce79dcbfc5b6a69e8a9450a582e72e0fc0fd9178 Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Tue, 17 Jan 2017 11:31:20 +0100
+Subject: [PATCH] virtio_console: initialize console size with correct values
+
+Console size was set to zero when a port was added. This patch sets cols
+and rows to the values stored in the configuration space when multiport
+support is enabled.
+---
+ drivers/char/virtio_console.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
+index 8b00e79..6396d38 100644
+--- a/drivers/char/virtio_console.c
++++ b/drivers/char/virtio_console.c
+@@ -1418,6 +1418,14 @@ static int add_port(struct ports_device *portdev, u32 id)
+ 	port->async_queue = NULL;
+ 
+ 	port->cons.ws.ws_row = port->cons.ws.ws_col = 0;
++	if (!use_multiport(portdev)) {
++		struct virtio_device *vdev = portdev->vdev;
++
++		virtio_cread(vdev, struct virtio_console_config, cols,
++			     &port->cons.ws.ws_col);
++		virtio_cread(vdev, struct virtio_console_config, rows,
++			     &port->cons.ws.ws_row);
++	}
+ 
+ 	port->host_connected = port->guest_connected = false;
+ 	port->stats = (struct port_stats) { 0 };
+-- 
+2.7.4
+

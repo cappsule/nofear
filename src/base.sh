@@ -42,7 +42,9 @@ function init_network()
 
 function main()
 {
-	local dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+	local dir
+	dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 	local hostname="$1"
 	shift
 
@@ -53,7 +55,7 @@ function main()
 	init_filesystem
 	init_network "$hostname"
 
-	exec "$dir/overlayfs.sh" $*
+	exec "$dir/overlayfs.sh" "$@"
 }
 
-main $*
+main "$@"

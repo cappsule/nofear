@@ -31,9 +31,10 @@ function run_xpra()
 
 function main()
 {
-	local xpra_port='65536'
+	local xpra_port
 
 	# this trick avoids to have to specify the port on the command line
+	# shellcheck disable=SC2153
 	if [ -n "$XPRA_PORT" ]; then
 		xpra_port="$XPRA_PORT"
 	elif [ $# -ne 0 ]; then
@@ -53,7 +54,7 @@ function main()
 	fi
 
 	xpra_cleanup
-	run_xpra "$xpra_port" $*
+	run_xpra "$xpra_port" "$@"
 }
 
-main $*
+main "$@"

@@ -27,4 +27,4 @@ function main()
 	tar xjvf "build/$RELEASE_FILE"
 }
 
-main $*
+main "$@"

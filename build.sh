@@ -35,9 +35,10 @@ function build_bzimage()
 		sha256sum --check "$dst/SHA256SUMS.kernel"
 		tar -C "$dst/" -xJf "$dst/$version.tar.xz"
 
-		find patches/kernel/ -type f -name '*.patch' | sort -n | while read l; do
-			patch -d "$dst/$version/" -p1 < "$l"
-		done
+		find patches/kernel/ -type f -name '*.patch' | sort -n | \
+			while read -r l; do
+				patch -d "$dst/$version/" -p1 < "$l"
+			done
 	fi
 
 	mkdir -p "$dst/$version-build/"
@@ -67,7 +68,8 @@ function build_filesystem()
 	fi
 
 	# copy package manager configuration on Debian-like distros
-	local distro=$(lsb_release --short --id 2>/dev/null || true)
+	local distro
+	distro=$(lsb_release --short --id 2>/dev/null) || true
 	if [ "$distro" == "Ubuntu" ] || [ "$distro" == "Debian" ]; then
 		mkdir -p "$dst/var/lib/apt/lists/" \
 			  "$dst/var/lib/dpkg/" \
@@ -81,12 +83,14 @@ function build_filesystem()
 
 	# create archive
 	tar -C "$dst/" --owner=0 --group=0 -cjf "$dst.tar.bz2" ./
-	rm -rf "$dst/"
+	rm -rf "${dst:?}/"
 }
 
 function main()
 {
-	local build_dir="$(pwd)/build/"
+	local build_dir
+
+	build_dir="$(pwd)/build/"
 
 	mkdir -p "$build_dir/"
 
@@ -111,5 +115,5 @@ function main()
 if [ $# -eq 0 ]; then
 	main 'bzimage' 'filesystem' 'kvmtool'
 else
-	main $*
+	main "$@"
 fi

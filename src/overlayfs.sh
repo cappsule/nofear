@@ -129,12 +129,12 @@ function run_command
 	# return 0 (otherwise the script exits right away without calling cleanup)
 	if "$root"; then
 		export HOME=/root
-		chroot "$target/overlay" $* \
+		chroot "$target/overlay" "$@" \
 			|| true
 	else
 		export HOME=/home/user
 		#resize
-		chroot --userspec=user:user "$target/overlay" $* \
+		chroot --userspec=user:user "$target/overlay" "$@" \
 			|| true
 	fi
 }
@@ -158,9 +158,9 @@ function main()
 	bind_virt "$target"
 	mount_shared_folder "$target" "$NOFEAR_SHARED"
 
-	run_command "$target" false $*
+	run_command "$target" false "$@"
 
 	cleanup "$target"
 }
 
-main $*
+main "$@"

@@ -54,7 +54,7 @@ function uninstall()
 
 function main()
 {
-	if [ $(id -u) -ne 0 ]; then
+	if [ "$(id -u)" -ne 0 ]; then
 		echo "[-] root privileges required"
 		exit 1
 	fi
@@ -69,4 +69,4 @@ function main()
 	fi
 }
 
-main $*
+main "$@"

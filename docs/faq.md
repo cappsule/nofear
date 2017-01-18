@@ -25,8 +25,8 @@ software distributed through the distro packages.
   whole host filesystem.
 - To allow different instances of kvmtool to use a stage2 script without race
   condition. This script is a unique temporary file respecting this template:
-  `~/.lkvm/[profile]/virt/sandbox-XXXXXXXX` whose path is to the guest through
-  the kernel cmdline.
+  `~/.lkvm/[profile]/virt/sandbox-XXXXXXXX` whose path is given to the guest
+  through the kernel cmdline.
 
 
 
@@ -52,13 +52,13 @@ or:
 
 ## What's the current state of the GUI feature?
 
-The launch hangs sometimes for no reason. We're investigating the issue.
-Currently, the Xpra server and Xpra client communicate through a TCP connection.
-It isn't optimal at all, and a weird socat trick is used to allow the host to
-connect to the guest. According to this
-[ticket](http://xpra.org/trac/ticket/983), performances should be better and
-implementation cleaner once the VSOCK protocol will be packaged in Linux and
-Xpra packages.
+The launch hangs sometimes for no reason. We're investigating the
+[issue](https://github.com/cappsule/nofear/issues/4). Currently, the Xpra server
+and Xpra client communicate through a TCP connection. It isn't optimal at all,
+and a weird socat trick is used to allow the host to connect to the guest.
+According to this [ticket](http://xpra.org/trac/ticket/983), performances should
+be better and implementation cleaner once the VSOCK protocol will be packaged in
+Linux and Xpra packages.
 
 
 

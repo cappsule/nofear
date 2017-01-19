@@ -25,7 +25,7 @@ function build_bzimage()
 {
 	local config="$1"
 	local dst="$2"
-	local version='linux-4.4.27'
+	local version='linux-4.9.6'
 
 	if [ ! -d "$dst/$version" ]; then
 		if [ ! -f "$dst/$version.tar.xz" ]; then

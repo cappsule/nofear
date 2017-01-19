@@ -17,14 +17,13 @@ diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
 index 2b49b11..57584fb 100644
 --- a/arch/x86/kernel/cpu/common.c
 +++ b/arch/x86/kernel/cpu/common.c
-@@ -559,9 +559,11 @@ static void get_cpu_vendor(struct cpuinfo_x86 *c)
+@@ -623,8 +623,10 @@ static void get_cpu_vendor(struct cpuinfo_x86 *c)
  		}
  	}
  
 +#if 0
- 	printk_once(KERN_ERR
- 			"CPU: vendor_id '%s' unknown, using generic init.\n" \
- 			"CPU: Your system may be unstable.\n", v);
+	pr_err_once("CPU: vendor_id '%s' unknown, using generic init.\n" \
+		    "CPU: Your system may be unstable.\n", v);
 +#endif
  
  	c->x86_vendor = X86_VENDOR_UNKNOWN;
@@ -33,7 +32,7 @@ diff --git a/arch/x86/kernel/cpu/microcode/core.c b/arch/x86/kernel/cpu/microcod
 index b3e94ef..dfccd3e 100644
 --- a/arch/x86/kernel/cpu/microcode/core.c
 +++ b/arch/x86/kernel/cpu/microcode/core.c
-@@ -637,8 +637,10 @@ int __init microcode_init(void)
+@@ -610,8 +610,10 @@ int __init microcode_init(void)
  		microcode_ops = init_intel_microcode();
  	else if (c->x86_vendor == X86_VENDOR_AMD)
  		microcode_ops = init_amd_microcode();

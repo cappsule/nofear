@@ -1,0 +1,29 @@
+From 28b9bc9361fbf680784ea3890f54a0b3f3f28fa9 Mon Sep 17 00:00:00 2001
+From: "G. Campana" <gcampana+nofear@quarkslab.com>
+Date: Thu, 26 Jan 2017 14:43:53 +0100
+Subject: [PATCH] comment out APIC error message
+
+---
+ arch/x86/kernel/cpu/common.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 023c7bf..ea31086 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -990,10 +990,12 @@ static void validate_apic_and_package_id(struct cpuinfo_x86 *c)
+ 
+ 	apicid = apic->cpu_present_to_apicid(cpu);
+ 
++#if 0
+ 	if (apicid != c->apicid) {
+ 		pr_err(FW_BUG "CPU%u: APIC id mismatch. Firmware: %x APIC: %x\n",
+ 		       cpu, apicid, c->initial_apicid);
+ 	}
++#endif
+ 	BUG_ON(topology_update_package_map(c->phys_proc_id, cpu));
+ #else
+ 	c->logical_proc_id = 0;
+-- 
+2.7.4
+

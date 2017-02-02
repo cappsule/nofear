@@ -50,6 +50,17 @@ function mount_loop
 		unitialized=1
 	fi
 
+	# If /sys is mounted, we get the following errors whenever mount or
+	# umount are executed:
+	#
+	#   mount: /proc/self/mountinfo: parse error: ignore entry at line 3.
+	#   umount: /proc/self/mountinfo: parse error: ignore entry at line 3.
+	#
+	# Because of the following line:
+	#
+	#   11 9 0:12 / /sys rw,relatime - sysfs  rw
+	umount /sys || true
+
 	mount -o loop "$image" "$target"
 
 	if [ "$unitialized" -eq "1" ]; then

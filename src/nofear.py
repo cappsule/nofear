@@ -117,11 +117,16 @@ class Profile:
         shutil.rmtree(self.path)
         print('[+] profile "{}" deleted successfully'.format(self.name), file=sys.stderr)
 
-
     def create_init_script(self, gui, xpra_port, shared_folder, *args):
         script = InitScript(gui, xpra_port, shared_folder, *args)
         script.write(self.name, self.path)
         return script
+
+    def get_shmem_path(self, basename=True):
+        filename = 'nofear.{}.shmem'.format(self.name)
+        if not basename:
+            filename = os.path.join('/dev/shm/', filename)
+        return filename
 
 
 def set_pdeath(sig):
@@ -158,7 +163,7 @@ class XpraTCPProxy(threading.Thread):
             self.sock2.sendall(data)
 
 
-def run_xpra(xpra_socket, xpra_port, with_sound=False):
+def run_xpra(profile, xpra_socket, xpra_port, with_sound=False):
     '''Proxify connection between guest and host xpra.'''
 
     # wait for incoming connection from guest xpra
@@ -175,9 +180,9 @@ def run_xpra(xpra_socket, xpra_port, with_sound=False):
         s.close()
         print('[*] nofear: executing xpra', file=sys.stderr)
         devnull = open('/dev/null', 'w')
-        os.dup2(devnull.fileno(), sys.stderr.fileno())
+        #os.dup2(devnull.fileno(), sys.stderr.fileno())
 
-        xpra_cmd = [ 'xpra', 'attach', 'tcp:127.0.0.1:{}'.format(port) ]
+        xpra_cmd = [ 'xpra', 'attach', 'tcp:127.0.0.1:{}'.format(port), '--mmap=yes' ]
         if not with_sound:
             xpra_cmd.insert(2, '--speaker=disabled')
         else:
@@ -185,6 +190,9 @@ def run_xpra(xpra_socket, xpra_port, with_sound=False):
 
         # enforce some options from nofear's xpra configuration
         os.putenv('XPRA_USER_CONF_DIR', NOFEAR_DIR)
+
+        os.putenv('LD_PRELOAD', os.path.join(NOFEAR_DIR, 'libmmap.so'))
+        os.putenv('HOST_MMAP_FILE_PATH', profile.get_shmem_path(basename=False))
 
         os.execvp(xpra_cmd[0], xpra_cmd)
         sys.exit(1)
@@ -271,10 +279,10 @@ if __name__ == '__main__':
 
     lkvm_cmd = [
         'lkvm-nofear', 'run',
-	'--kernel', os.path.join(NOFEAR_DIR, 'bzImage'),
-	'--mem', '2048',
-	'--params', 'console=hvc0 quiet sandbox={}'.format(script.get_tmpname()),
-	'--disk', profile.name,
+        '--kernel', os.path.join(NOFEAR_DIR, 'bzImage'),
+        '--mem', '2048',
+        '--params', 'console=hvc0 quiet sandbox={}'.format(script.get_tmpname()),
+        '--disk', profile.name,
         #'--network', 'mode=user,guest_mac=02:15:15:15:15:15',
         '--network', 'mode=tap,guest_mac=02:15:15:15:13:37',
         '--console', 'virtio',
@@ -285,10 +293,16 @@ if __name__ == '__main__':
 
     # launch gui if specified
     if args.gui:
+        # Use SHMEM_DEFAULT_ADDR (0xc8000000) to avoid a lkvm warning
+        lkvm_cmd += [
+            '--shmem',
+            'pci:0xc8000000:128M:handle=/{}:create'.format(profile.get_shmem_path())
+        ]
         pid = os.fork()
         if pid == 0:
             set_pdeath(signal.SIGTERM)
-            run_xpra(xpra_socket, xpra_port, with_sound=args.sound)
+            run_xpra(profile, xpra_socket, xpra_port, with_sound=args.sound)
+            os.unlink(profile.get_shmem_path(basename=False))
             sys.exit(0)
         else:
             xpra_socket.close()

@@ -29,6 +29,7 @@ function install()
 	   src/gui.sh \
 	   src/overlayfs.sh \
 	   src/xpra.conf \
+	   distro/mmap/libmmap.so \
 	   "${SHARE}/"
 
 	echo '[+] nofear installed'
@@ -44,7 +45,8 @@ function uninstall()
 	   "${SHARE}/base.sh" \
 	   "${SHARE}/gui.sh" \
 	   "${SHARE}/overlayfs.sh" \
-	   "${SHARE}/xpra.conf"
+	   "${SHARE}/xpra.conf" \
+	   "${SHARE}/libmmap.so"
 	if [ -d "${SHARE}/" ]; then
 		rmdir "${SHARE}/"
 	fi
